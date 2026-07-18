@@ -103,6 +103,12 @@ function observeReveals() {
   document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 }
 
+// Wire up scroll-reveal immediately — these are static section wrappers
+// already present in the HTML, not created by the data fetches below,
+// so there's no reason to wait on the backend for this to work.
+observeReveals();
+
+
 /* ── 5. ACTIVE NAV LINK ON SCROLL ──────────── (unchanged from before) */
 const sections  = document.querySelectorAll('section[id]');
 const navAnchors = document.querySelectorAll('.nav-links a');
@@ -313,8 +319,11 @@ async function loadContactInfo() {
 /* ── LOADING OVERLAY — hide once real data has loaded ──
    A timeout fallback guarantees the overlay never gets stuck
    showing forever if the backend is unreachable or very slow. */
-const loadingOverlay = document.getElementById('loadingOverlay');
+const loadingOverlay  = document.getElementById('loadingOverlay');
+const loadingText     = document.getElementById('loadingText');
+const loadingSubtext  = document.getElementById('loadingSubtext');
 let overlayHidden = false;
+let dataLoaded    = false;
 
 function hideLoadingOverlay() {
   if (overlayHidden || !loadingOverlay) return;
@@ -325,9 +334,16 @@ function hideLoadingOverlay() {
   setTimeout(() => loadingOverlay.remove(), 600);
 }
 
-// Safety net: even if the backend never responds, don't leave
-// visitors staring at a spinner forever.
-setTimeout(hideLoadingOverlay, 8000);
+// If the backend hasn't responded within 15s, tell the visitor rather
+// than leaving them guessing, then reveal the page with its saved
+// (static) content after a moment so the message is actually readable.
+function showConnectionErrorThenReveal() {
+  if (dataLoaded || overlayHidden) return;   // data arrived in time — nothing to do
+  if (loadingText)    loadingText.textContent = "⚠ Couldn't reach the server";
+  if (loadingSubtext) loadingSubtext.textContent = "Showing the saved version of this page instead.";
+  setTimeout(hideLoadingOverlay, 2500);
+}
+setTimeout(showConnectionErrorThenReveal, 15000);
 
 /* ── LOAD EVERYTHING ON PAGE LOAD ──
    Promise.all fires all six requests in PARALLEL rather than one
@@ -342,9 +358,7 @@ async function loadAllContent() {
     loadProjects(),
     loadContactInfo(),
   ]);
-  // Re-scan for .reveal elements now that dynamic content has replaced
-  // the static placeholders, so the scroll-in animation still applies.
-  observeReveals();
+  dataLoaded = true;
   hideLoadingOverlay();
 }
 
