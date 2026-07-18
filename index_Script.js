@@ -1,10 +1,7 @@
 /* ════════════════════════════════════════════════════════════
    CONFIG — point this at your running backend.
-   Change this when you deploy the API somewhere other than localhost.
    ════════════════════════════════════════════════════════════ */
-const API_BASE = "http://127.0.0.1:8000";
-// TODO (post-deploy): replace the line above with your real Vercel URL,
-// e.g. const API_BASE = "https://your-project.vercel.app";
+const API_BASE = "https://portfolio-xi-lime-36.vercel.app";
 
 /* ── 0. WARM-UP PING ──────────────────────────────────────────
    Fires the instant this script runs, before anything else —
