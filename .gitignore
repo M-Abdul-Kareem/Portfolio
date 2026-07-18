@@ -18,3 +18,10 @@ env/
 # OS
 Thumbs.db
 .DS_Store
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+
+# Build artifacts
+*.pyc
