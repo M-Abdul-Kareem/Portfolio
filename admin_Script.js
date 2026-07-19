@@ -310,7 +310,10 @@ async function loadAbout() {
 
   currentPhotoUrl = about.photo_url || "";
   if (currentPhotoUrl) {
-    document.getElementById("photoPreviewImg").src = API_BASE + currentPhotoUrl;
+    // Cloudinary returns a full, ready-to-use HTTPS URL already —
+    // don't prepend API_BASE (that was only needed for the old
+    // local-disk-storage design, where photo_url was a relative path).
+    document.getElementById("photoPreviewImg").src = currentPhotoUrl;
     document.getElementById("photoPreviewImg").hidden = false;
     document.getElementById("photoPreviewEmoji").hidden = true;
   }
@@ -399,7 +402,11 @@ photoInput.addEventListener("change", async () => {
     }
 
     currentPhotoUrl = data.photo_url;
-    document.getElementById("photoPreviewImg").src = API_BASE + currentPhotoUrl + "?t=" + Date.now();
+    // Same fix as loadAbout(): Cloudinary's URL is already complete.
+    // The ?t= cache-bust still matters since Cloudinary overwrites the
+    // same public_id every time, so browsers would otherwise keep
+    // showing the old cached image at that identical URL.
+    document.getElementById("photoPreviewImg").src = currentPhotoUrl + "?t=" + Date.now();
     document.getElementById("photoPreviewImg").hidden = false;
     document.getElementById("photoPreviewEmoji").hidden = true;
     toast("Photo uploaded. Don't forget it's already saved — no need to click 'Save About Section'.");

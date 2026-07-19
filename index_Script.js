@@ -224,7 +224,9 @@ async function loadAbout() {
   if (about.photo_url) {
     const img = document.getElementById('aboutAvatarImg');
     const emoji = document.getElementById('aboutAvatarEmoji');
-    img.src = API_BASE + about.photo_url;
+    // Cloudinary returns a full HTTPS URL already — don't prepend
+    // API_BASE (leftover from the old local-disk-storage design).
+    img.src = about.photo_url;
     img.hidden = false;
     emoji.hidden = true;
   }
