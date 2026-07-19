@@ -21,9 +21,16 @@ Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 # ── 1. ADMIN ACCOUNT ──────────────────────────────────
+import os
+
+# Read from environment variables — never hardcode real credentials here.
+# Set these before running seed.py, e.g.:
+#   export ADMIN_USERNAME="youradminname"
+#   export ADMIN_PASSWORD="a-strong-unique-password"
+#   export ADMIN_EMAIL="you@example.com"
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "ChangeMe123!")   # ⚠️ Change this after first login in a real deployment
-ADMIN_EMAIL = "m.abdulkareem.5122006@gmail.com"  # where 2FA codes and security alerts are sent
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "ChangeMe123!")   # ⚠️ placeholder only — always override via env var in real deployments
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")  # where 2FA codes and security alerts are sent
 
 if not db.query(AdminUser).filter(AdminUser.username == ADMIN_USERNAME).first():
     db.add(AdminUser(username=ADMIN_USERNAME, password_hash=hash_password(ADMIN_PASSWORD), email=ADMIN_EMAIL))
